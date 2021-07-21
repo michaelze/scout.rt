@@ -270,7 +270,7 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
   }
 
   protected boolean isColumnTypeAllowedForSorting(IColumn col) {
-    return !(col instanceof AbstractIconColumn);
+    return !(col instanceof AbstractIconColumn) && !(col != null && byte[].class.isAssignableFrom(col.getDataType()));
   }
 
   @ClassId("dbf260be-ee6c-4f6f-99c6-9b7bcbdf7d61")
