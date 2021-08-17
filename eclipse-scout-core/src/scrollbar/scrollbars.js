@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -125,6 +125,17 @@ export function _installNativeInternal($container, options) {
     $container.css('overflow', 'auto');
   }
   $container.css('-webkit-overflow-scrolling', 'touch');
+  $container.appendDiv('invisible scroll-shadow top');
+  // $container.appendDiv('invisible scroll-shadow bottom');
+  $container.on('scroll', () => {
+    let offsetSize = $container[0].offsetHeight;
+    let scrollSize = $container[0].scrollHeight;
+    let scrollPos = $container[0].scrollTop;
+    let atStart = scrollPos === 0;
+    let atEnd = scrollPos >= scrollSize - offsetSize;
+    $container.children('.scroll-shadow.top').toggleClass('invisible', atStart);
+    $container.children('.scroll-shadow.bottom').toggleClass('invisible', atEnd);
+  });
 }
 
 export function isHybridScrolling($scrollable) {

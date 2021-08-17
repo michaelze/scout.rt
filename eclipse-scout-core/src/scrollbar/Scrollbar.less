@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -127,4 +127,51 @@
 
 .hybrid-scrollable {
   #scout.hide-scrollbars();
+}
+
+
+@scroll-shadow-size: 0;
+
+.scroll-shadow {
+  position: sticky;
+  pointer-events: none;
+  z-index: 1;
+  transition: visibility 200ms, opacity 200ms;
+  opacity: 1;
+
+  &.invisible {
+    opacity: 0;
+  }
+
+  &.left {
+    #scout.inset-shadow-left(@x: @scroll-shadow-size);
+    height: 100%;
+    width: @scroll-shadow-size;
+    left: 0;
+    display: none;
+  }
+
+  &.right {
+    #scout.inset-shadow-right(@x: -@scroll-shadow-size);
+    height: 100%;
+    width: @scroll-shadow-size;
+    right: 0;
+    //margin-left: -@scroll-shadow-size;
+    display: none;
+  }
+
+  &.top {
+    #scout.inset-shadow-top(@y: @scroll-shadow-size);
+    height: @scroll-shadow-size;
+    width: 100%;
+    top: 0;
+  }
+
+  &.bottom {
+    #scout.inset-shadow-bottom(@y: -@scroll-shadow-size);
+    height: @scroll-shadow-size;
+    width: 100%;
+    bottom: 0;
+    //margin-top: -@scroll-shadow-size;
+  }
 }
