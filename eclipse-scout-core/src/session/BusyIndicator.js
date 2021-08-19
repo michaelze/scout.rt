@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget} from '../index';
+import {ClickActiveElementKeyStroke, CloseKeyStroke, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget} from '../index';
 
 export default class BusyIndicator extends Widget {
 
@@ -18,6 +18,7 @@ export default class BusyIndicator extends Widget {
     this.showTimeout = 2500;
     this.label = null;
     this.details = null;
+    this.cancelButton = null;
   }
 
   /**
@@ -38,7 +39,10 @@ export default class BusyIndicator extends Widget {
         keys.SPACE, keys.ENTER
       ]),
       new CloseKeyStroke(this, (() => {
-        return this.$cancelButton;
+        if (!this.cancelButton) {
+          return null;
+        }
+        return this.cancelButton.$container;
       }))
     ]);
   }
@@ -67,13 +71,12 @@ export default class BusyIndicator extends Widget {
     this.$details = this.$content.appendDiv('busyindicator-details');
 
     if (this.cancellable) {
-      this.$buttons = this.$container.appendDiv('busyindicator-buttons');
-      let boxButtons = new BoxButtons(this.$buttons);
-      this.$cancelButton = boxButtons.addButton({
-        text: this.session.text('Cancel'),
-        onClick: this._onCancelClick.bind(this)
-      });
-      this.$cancelButton.css('width', '100%');
+      let boxButtons = scout.create('BoxButtons', {parent: this});
+      this.cancelButton = boxButtons.addButton({text: this.session.text('Cancel')});
+      this.cancelButton.one('action', event => this._onCancelClick(event));
+      boxButtons.render(this.$container);
+      this.$buttons = boxButtons.$container;
+      this.$buttons.addClass('busyindicator-buttons');
     } else {
       this.$content.addClass('no-buttons');
     }
@@ -97,7 +100,7 @@ export default class BusyIndicator extends Widget {
       this.session.focusManager.validateFocus();
     }, this.showTimeout);
 
-    // Render modality glasspanes
+    // Render modality glass-panes
     this._glassPaneRenderer = new GlassPaneRenderer(this);
     this._glassPaneRenderer.renderGlassPanes();
     this._glassPaneRenderer.eachGlassPane($glassPane => {
@@ -150,9 +153,9 @@ export default class BusyIndicator extends Widget {
    * Used by CloseKeyStroke.js
    */
   close() {
-    if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
-      this.$cancelButton.focus();
-      this.$cancelButton.click();
+    if (this.cancelButton && this.cancelButton.$container && this.session.focusManager.requestFocus(this.cancelButton.$container)) {
+      this.cancelButton.$container.focus();
+      this.cancelButton.doAction();
     }
   }
 
