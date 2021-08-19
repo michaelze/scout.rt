@@ -9,8 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 @scrollbar-size-transition-speed: 125ms;
+@scroll-shadow-size-large: 10px;
 @scroll-shadow-size: 10px;
-@scroll-shadow-alpha: 20%;
+@scroll-shadow-alpha: 100%;
 
 .scrollbar {
   position: absolute;
@@ -132,57 +133,84 @@
 }
 
 .scroll-shadow {
+  transition: box-shadow 250ms;
   position: absolute;
   pointer-events: none;
-  z-index: 1;
-  transition: visibility 200ms, opacity 200ms;
-  opacity: 1;
 
-  &.invisible {
-    opacity: 0;
-  }
+  #scout.scroll-shadow(@scroll-shadow-size);
 
-  &.left {
-    #scout.scroll-shadow-left();
-    height: 100%;
-    width: @scroll-shadow-size;
-  }
-
-  &.right {
-    #scout.scroll-shadow-right();
-    height: 100%;
-    width: @scroll-shadow-size;
-    margin-left: -@scroll-shadow-size;
-  }
-
-  &.top {
-    #scout.scroll-shadow-top();
-    width: 100%;
-    height: @scroll-shadow-size;
-  }
-
-  &.bottom {
-    #scout.scroll-shadow-bottom();
-    width: 100%;
-    height: @scroll-shadow-size;
-    margin-top: -@scroll-shadow-size;
+  &.large {
+    #scout.scroll-shadow(@scroll-shadow-size-large);
   }
 }
 
 #scout {
-  .scroll-shadow-top(@y: @scroll-shadow-size, @blur: @scroll-shadow-size, @alpha: @scroll-shadow-alpha) {
-    box-shadow: inset 0 @y @blur -@blur rgba(0, 0, 0, @alpha), 0 -110px @blur 100px rgba(0, 0, 0, @alpha);
-  }
+  .scroll-shadow(@scroll-shadow-size) {
+    @scroll-shadow-blur-spread-color: @scroll-shadow-size -@scroll-shadow-size rgba(0, 0, 0, @scroll-shadow-alpha);
+    @scroll-shadow-top: inset 0 @scroll-shadow-size @scroll-shadow-blur-spread-color;
+    @scroll-shadow-bottom: inset 0 -@scroll-shadow-size @scroll-shadow-blur-spread-color;
+    @scroll-shadow-left: inset @scroll-shadow-size 0 @scroll-shadow-blur-spread-color;
+    @scroll-shadow-right: inset -@scroll-shadow-size 0 @scroll-shadow-blur-spread-color;
+    @scroll-shadow-none: inset 0 0 0 0 transparent;
 
-  .scroll-shadow-bottom(@y: @scroll-shadow-size, @blur: @scroll-shadow-size, @alpha: @scroll-shadow-alpha) {
-    box-shadow: inset 0 -@y @blur -@blur rgba(0, 0, 0, @alpha), 0 110px @blur 100px rgba(0, 0, 0, @alpha);
-  }
+    &.scroll-shadow-top {
+      box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-none;
 
-  .scroll-shadow-left(@x: @scroll-shadow-size, @blur: @scroll-shadow-size, @alpha: @scroll-shadow-alpha) {
-    box-shadow: inset @x 0 @blur -@blur rgba(0, 0, 0, @alpha), -110px 0 @blur 100px rgba(0, 0, 0, @alpha)
-  }
+      &.scroll-shadow-bottom {
+        box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-none;
 
-  .scroll-shadow-right(@x: @scroll-shadow-size, @blur: @scroll-shadow-size, @alpha: @scroll-shadow-alpha) {
-    box-shadow: inset -@x 0 @blur -@blur rgba(0, 0, 0, @alpha), 110px 0 @blur 100px rgba(0, 0, 0, @alpha);
+        &.scroll-shadow-left {
+          box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-left;
+        }
+
+        &.scroll-shadow-right {
+          box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-none;
+
+          &.scroll-shadow-left {
+            box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-left;
+          }
+        }
+      }
+
+      &.scroll-shadow-left {
+        box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-left;
+
+        &.scroll-shadow-right {
+          box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-left;
+        }
+      }
+
+      &.scroll-shadow-right {
+        box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-none;
+      }
+    }
+
+    &.scroll-shadow-bottom {
+      box-shadow: @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-none;
+
+      &.scroll-shadow-right {
+        box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-none;
+      }
+    }
+
+    &.scroll-shadow-left {
+      box-shadow: @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-left;
+
+      &.scroll-shadow-right {
+        box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-left;
+      }
+
+      &.scroll-shadow-bottom {
+        box-shadow: @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-left;
+
+        &.scroll-shadow-right {
+          box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-left;
+        }
+      }
+    }
+
+    &.scroll-shadow-right {
+      box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-none;
+    }
   }
 }

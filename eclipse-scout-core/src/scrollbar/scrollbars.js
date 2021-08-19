@@ -64,15 +64,18 @@ export function removeScrollable(session, $container) {
 
 /**
  * @param [options]
- * @param [options.axis] x, y or both. Default is both.
+ * @param {string} [options.axis] x, y or both. Default is both.
  * @param {boolean} [options.nativeScrollbars]
  * @param {boolean} [options.hybridScrollbars]
+ * @param {boolean} [options.scrollShadow]
+ * @param {string} [options.scrollShadowSize] large for a larger shadow or undefined for the default size
  * @param {Session} [options.session]
  * @param {Widget} [options.parent]
  */
 export function install($container, options) {
   options = _createDefaultScrollToOptions(options);
   options.axis = options.axis || 'both';
+  options.scrollShadow = options.scrollShadow || 'all';
 
   // Don't use native as variable name because it will break minifying (reserved keyword)
   let nativeScrollbars = scout.nvl(options.nativeScrollbars, Device.get().hasPrettyScrollbars());
@@ -96,11 +99,13 @@ export function install($container, options) {
     htmlContainer.scrollable = true;
   }
   $container.data('scrollable', true);
-  $container.appendDiv('invisible scroll-shadow top');
-  $container.appendDiv('invisible scroll-shadow bottom');
-  $container.appendDiv('invisible scroll-shadow left');
-  $container.appendDiv('invisible scroll-shadow right');
+  // if (options.scrollShadow) {
+  let $shadow = $container.afterDiv('scroll-shadow');
+  $shadow.toggleClass('large', options.scrollShadowSize === 'large');
+  $container.data('scroll-shadow', $shadow);
+  $shadow.data('scroll-shadow-parent', $container);
   $container.on('scroll', () => updateScrollShadows($container));
+  // }
   let session = options.session || options.parent.session;
   pushScrollable(session, $container);
   return $container;
@@ -133,26 +138,20 @@ export function _installNativeInternal($container, options) {
 }
 
 export function updateScrollShadows($container) {
-  $container.children('.scroll-shadow.top').cssTop(0).cssLeft(0);
-  $container.children('.scroll-shadow.left').cssTop(0).cssLeft(0);
-  $container.children('.scroll-shadow.bottom').cssBottom(0).cssRight(0);
-  $container.children('.scroll-shadow.right').cssBottom(0).cssRight(0);
-
   let scrollTop = $container[0].scrollTop;
   let scrollLeft = $container[0].scrollLeft;
   let atTop = atStart(scrollTop);
   let atBottom = atEnd(scrollTop, $container[0].scrollHeight, $container[0].offsetHeight);
   let atLeft = atStart(scrollLeft);
   let atRight = atEnd(scrollLeft, $container[0].scrollWidth, $container[0].offsetWidth);
-  $container.children('.scroll-shadow.top').toggleClass('invisible', atTop);
-  $container.children('.scroll-shadow.bottom').toggleClass('invisible', atBottom);
-  $container.children('.scroll-shadow.left').toggleClass('invisible', atLeft);
-  $container.children('.scroll-shadow.right').toggleClass('invisible', atRight);
-
-  $container.children('.scroll-shadow.top').cssTop(scrollTop).cssLeft(scrollLeft);
-  $container.children('.scroll-shadow.left').cssTop(scrollTop).cssLeft(scrollLeft);
-  $container.children('.scroll-shadow.bottom').cssBottom(-1 * scrollTop).cssRight(-1 * scrollLeft);
-  $container.children('.scroll-shadow.right').cssBottom(-1 * scrollTop).cssRight(-1 * scrollLeft);
+  let $shadow = $container.data('scroll-shadow');
+  $shadow.toggleClass('scroll-shadow-top', !atTop);
+  $shadow.toggleClass('scroll-shadow-bottom', !atBottom);
+  $shadow.toggleClass('scroll-shadow-left', !atLeft);
+  $shadow.toggleClass('scroll-shadow-right', !atRight);
+  graphics.setBounds($shadow, graphics.bounds($container));
+  graphics.setMargins($shadow, graphics.margins($container));
+  $shadow.css('border-radius', $container.css('border-radius'));
 
   function atStart(scrollPos) {
     return scrollPos === 0;
@@ -214,6 +213,11 @@ export function uninstall($container, session) {
     return;
   }
 
+  let $shadow = $container.data('scroll-shadow');
+  if ($shadow) {
+    $shadow.remove();
+  }
+
   let scrollbars = $container.data('scrollbars');
   if (scrollbars) {
     scrollbars.forEach(scrollbar => {
@@ -223,7 +227,7 @@ export function uninstall($container, session) {
   removeScrollable(session, $container);
   $container.removeData('scrollable');
   $container.css('overflow', '');
-  $container.removeClass('hybrid-scrollable');
+  $container.removeClass('hybrid-scrollable scroll-shadow');
   $container.removeData('scrollbars');
 
   let htmlContainer = HtmlComponent.optGet($container);

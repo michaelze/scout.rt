@@ -115,7 +115,6 @@ export default class Scrollbar extends Widget {
     this._$thumb.off('mousedown', '', this._onThumbMouseDownHandler);
     this._$ancestors.off('scroll resize', this._onAncestorScrollOrResizeHandler);
     this._$ancestors = null;
-    // this.$parent.children('.scroll-shadow' + this.axis).remove();
 
     super._remove();
   }
@@ -191,14 +190,8 @@ export default class Scrollbar extends Widget {
     // show scrollbar
     if (this._offsetSize + offsetFix >= this._scrollSize) {
       this.$container.css('display', 'none');
-      // this.$parent.children('.scroll-shadow.' + this._dir).addClass('invisible');
-      // this.$parent.children('.scroll-shadow.' + this._dirReverse).addClass('invisible');
     } else {
       this.$container.css('display', '');
-      let atStart = scrollPos === 0;
-      let atEnd = scrollPos >= this._scrollSize - this._offsetSize;
-      // this.$parent.children('.scroll-shadow.' + this._dir).toggleClass('invisible', atStart);// TODO CGU brushup cleanup, how to make it work for native scrolling?
-      // this.$parent.children('.scroll-shadow.' + this._dirReverse).toggleClass('invisible', atEnd);
 
       // indicate that thumb movement is not possible
       if (this._isContainerTooSmallForThumb()) {
@@ -214,10 +207,6 @@ export default class Scrollbar extends Widget {
     // Always update both to make sure every scrollbar (x and y) is positioned correctly
     this.$container.cssRight(-1 * scrollLeft);
     this.$container.cssBottom(-1 * scrollTop);
-    // this.$parent.children('.scroll-shadow.' + this._dirReverse).cssRight(-1 * scrollLeft); // TODO CGU brushup how does it look if not updated immediately?
-    // this.$parent.children('.scroll-shadow.' + this._dirReverse).cssBottom(-1 * scrollTop);
-    // this.$parent.children('.scroll-shadow.' + this._dir).cssLeft(scrollLeft);
-    // this.$parent.children('.scroll-shadow.' + this._dir).cssTop(scrollTop);
   }
 
   _resetClipping() {
@@ -332,10 +321,6 @@ export default class Scrollbar extends Widget {
     this._$thumb.css(this._dim.toLowerCase(), 0);
     this.$container.cssRight(0);
     this.$container.cssBottom(0);
-    // this.$parent.children('.scroll-shadow.' + this._dirReverse).cssRight(0);
-    // this.$parent.children('.scroll-shadow.' + this._dirReverse).cssBottom(0);
-    // this.$parent.children('.scroll-shadow.' + this._dir).cssLeft(0);
-    // this.$parent.children('.scroll-shadow.' + this._dir).cssTop(0);
   }
 
   /*
