@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 @scrollbar-size-transition-speed: 125ms;
+@scroll-shadow-size: 10px;
+@scroll-shadow-alpha: 20%;
 
 .scrollbar {
   position: absolute;
@@ -129,11 +131,8 @@
   #scout.hide-scrollbars();
 }
 
-
-@scroll-shadow-size: 0;
-
 .scroll-shadow {
-  position: sticky;
+  position: absolute;
   pointer-events: none;
   z-index: 1;
   transition: visibility 200ms, opacity 200ms;
@@ -144,34 +143,46 @@
   }
 
   &.left {
-    #scout.inset-shadow-left(@x: @scroll-shadow-size);
+    #scout.scroll-shadow-left();
     height: 100%;
     width: @scroll-shadow-size;
-    left: 0;
-    display: none;
   }
 
   &.right {
-    #scout.inset-shadow-right(@x: -@scroll-shadow-size);
+    #scout.scroll-shadow-right();
     height: 100%;
     width: @scroll-shadow-size;
-    right: 0;
-    //margin-left: -@scroll-shadow-size;
-    display: none;
+    margin-left: -@scroll-shadow-size;
   }
 
   &.top {
-    #scout.inset-shadow-top(@y: @scroll-shadow-size);
-    height: @scroll-shadow-size;
+    #scout.scroll-shadow-top();
     width: 100%;
-    top: 0;
+    height: @scroll-shadow-size;
   }
 
   &.bottom {
-    #scout.inset-shadow-bottom(@y: -@scroll-shadow-size);
-    height: @scroll-shadow-size;
+    #scout.scroll-shadow-bottom();
     width: 100%;
-    bottom: 0;
-    //margin-top: -@scroll-shadow-size;
+    height: @scroll-shadow-size;
+    margin-top: -@scroll-shadow-size;
+  }
+}
+
+#scout {
+  .scroll-shadow-top(@y: @scroll-shadow-size, @blur: @scroll-shadow-size, @alpha: @scroll-shadow-alpha) {
+    box-shadow: inset 0 @y @blur -@blur rgba(0, 0, 0, @alpha), 0 -110px @blur 100px rgba(0, 0, 0, @alpha);
+  }
+
+  .scroll-shadow-bottom(@y: @scroll-shadow-size, @blur: @scroll-shadow-size, @alpha: @scroll-shadow-alpha) {
+    box-shadow: inset 0 -@y @blur -@blur rgba(0, 0, 0, @alpha), 0 110px @blur 100px rgba(0, 0, 0, @alpha);
+  }
+
+  .scroll-shadow-left(@x: @scroll-shadow-size, @blur: @scroll-shadow-size, @alpha: @scroll-shadow-alpha) {
+    box-shadow: inset @x 0 @blur -@blur rgba(0, 0, 0, @alpha), -110px 0 @blur 100px rgba(0, 0, 0, @alpha)
+  }
+
+  .scroll-shadow-right(@x: @scroll-shadow-size, @blur: @scroll-shadow-size, @alpha: @scroll-shadow-alpha) {
+    box-shadow: inset -@x 0 @blur -@blur rgba(0, 0, 0, @alpha), 110px 0 @blur 100px rgba(0, 0, 0, @alpha);
   }
 }

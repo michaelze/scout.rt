@@ -96,6 +96,11 @@ export function install($container, options) {
     htmlContainer.scrollable = true;
   }
   $container.data('scrollable', true);
+  $container.appendDiv('invisible scroll-shadow top');
+  $container.appendDiv('invisible scroll-shadow bottom');
+  $container.appendDiv('invisible scroll-shadow left');
+  $container.appendDiv('invisible scroll-shadow right');
+  $container.on('scroll', () => updateScrollShadows($container));
   let session = options.session || options.parent.session;
   pushScrollable(session, $container);
   return $container;
@@ -125,17 +130,37 @@ export function _installNativeInternal($container, options) {
     $container.css('overflow', 'auto');
   }
   $container.css('-webkit-overflow-scrolling', 'touch');
-  $container.appendDiv('invisible scroll-shadow top');
-  // $container.appendDiv('invisible scroll-shadow bottom');
-  $container.on('scroll', () => {
-    let offsetSize = $container[0].offsetHeight;
-    let scrollSize = $container[0].scrollHeight;
-    let scrollPos = $container[0].scrollTop;
-    let atStart = scrollPos === 0;
-    let atEnd = scrollPos >= scrollSize - offsetSize;
-    $container.children('.scroll-shadow.top').toggleClass('invisible', atStart);
-    $container.children('.scroll-shadow.bottom').toggleClass('invisible', atEnd);
-  });
+}
+
+export function updateScrollShadows($container) {
+  $container.children('.scroll-shadow.top').cssTop(0).cssLeft(0);
+  $container.children('.scroll-shadow.left').cssTop(0).cssLeft(0);
+  $container.children('.scroll-shadow.bottom').cssBottom(0).cssRight(0);
+  $container.children('.scroll-shadow.right').cssBottom(0).cssRight(0);
+
+  let scrollTop = $container[0].scrollTop;
+  let scrollLeft = $container[0].scrollLeft;
+  let atTop = atStart(scrollTop);
+  let atBottom = atEnd(scrollTop, $container[0].scrollHeight, $container[0].offsetHeight);
+  let atLeft = atStart(scrollLeft);
+  let atRight = atEnd(scrollLeft, $container[0].scrollWidth, $container[0].offsetWidth);
+  $container.children('.scroll-shadow.top').toggleClass('invisible', atTop);
+  $container.children('.scroll-shadow.bottom').toggleClass('invisible', atBottom);
+  $container.children('.scroll-shadow.left').toggleClass('invisible', atLeft);
+  $container.children('.scroll-shadow.right').toggleClass('invisible', atRight);
+
+  $container.children('.scroll-shadow.top').cssTop(scrollTop).cssLeft(scrollLeft);
+  $container.children('.scroll-shadow.left').cssTop(scrollTop).cssLeft(scrollLeft);
+  $container.children('.scroll-shadow.bottom').cssBottom(-1 * scrollTop).cssRight(-1 * scrollLeft);
+  $container.children('.scroll-shadow.right').cssBottom(-1 * scrollTop).cssRight(-1 * scrollLeft);
+
+  function atStart(scrollPos) {
+    return scrollPos === 0;
+  }
+
+  function atEnd(scrollPos, scrollSize, offsetSize) {
+    return scrollPos + 1 >= scrollSize - offsetSize;
+  }
 }
 
 export function isHybridScrolling($scrollable) {
@@ -217,6 +242,7 @@ export function update($scrollable, immediate) {
   if (!$scrollable || !$scrollable.data('scrollable')) {
     return;
   }
+  updateScrollShadows($scrollable);
   let scrollbars = $scrollable.data('scrollbars');
   if (!scrollbars) {
     if (Device.get().isIos()) {
