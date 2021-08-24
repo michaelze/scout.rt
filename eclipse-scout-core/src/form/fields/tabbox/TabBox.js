@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompositeField, FormField, HtmlComponent, scout, SingleLayout, TabArea, TabBoxLayout} from '../../../index';
+import {arrays, CompositeField, FormField, HtmlComponent, scout, scrollbars, SingleLayout, TabArea, TabBoxLayout} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -31,6 +31,7 @@ export default class TabBox extends CompositeField {
     this._$tabContent = null;
 
     this._tabBoxHeaderPropertyChangeHander = this._onTabBoxHeaderPropertyChange.bind(this);
+    this._selectedTabScrollTopChangeHandler = this._updateContentScrolled.bind(this);
   }
 
   /**
@@ -172,6 +173,7 @@ export default class TabBox extends CompositeField {
     if (this.selectedTab) {
       this.selectedTab.render(this._$tabContent);
     }
+    this.selectedTab.on('propertyChange:scrollTop', this._selectedTabScrollTopChangeHandler);
     if (this.rendered) {
       HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
     }
@@ -179,7 +181,15 @@ export default class TabBox extends CompositeField {
 
   _removeSelectedTab() {
     if (this.selectedTab) {
+      this.selectedTab.off('propertyChange:scrollTop', this._selectedTabScrollTopChangeHandler);
       this.selectedTab.remove();
+    }
+  }
+
+  _updateContentScrolled() {
+    if (this.rendered) {
+      let hasScrollShadow = this.selectedTab && scrollbars.hasScrollShadow(this.selectedTab.get$Scrollable(), 'top');
+      this.$container.toggleClass('content-scrolled-y', hasScrollShadow && this.selectedTab.scrollTop > 0);
     }
   }
 

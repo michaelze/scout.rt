@@ -26,6 +26,7 @@ import {
   MenuBar,
   ResponsiveManager,
   scout,
+  scrollbars,
   SplitBox,
   strings,
   TabBox,
@@ -72,6 +73,7 @@ export default class GroupBox extends CompositeField {
     this.$body = null;
     this.$title = null;
     this.$subLabel = null;
+    this._statusPositionOrg = null;
   }
 
   static BorderDecoration = {
@@ -99,6 +101,7 @@ export default class GroupBox extends CompositeField {
       menuOrder: new GroupBoxMenuItemsOrder(),
       ellipsisPosition: this.menuBarEllipsisPosition
     });
+    this.menuBar.on('propertyChange:visible', () => this._updateMenuBarVisible());
     this._setFields(this.fields);
     this._setMainBox(this.mainBox);
     this._updateMenuBar();
@@ -246,6 +249,7 @@ export default class GroupBox extends CompositeField {
     this._renderMenuBarEllipsisPosition();
     this._renderMenuBarVisible();
     this._renderSubLabel();
+    this._updateMenuBarVisible();
   }
 
   _createLayout() {
@@ -358,6 +362,39 @@ export default class GroupBox extends CompositeField {
    */
   get$Scrollable() {
     return this.$body;
+  }
+
+  _onScroll() {
+    super._onScroll();
+    this._updateContentScrolled();
+  }
+
+  _updateContentScrolled() {
+    if (!this.rendered) {
+      return;
+    }
+    let hasScrollShadow = scrollbars.hasScrollShadow(this.get$Scrollable(), 'top');
+    let contentScrolled = hasScrollShadow && this.scrollTop > 0;
+    let oldContentScrolled = this.$container.hasClass('content-scrolled-y');
+    this.$container.toggleClass('content-scrolled-y', contentScrolled);
+    if (oldContentScrolled !== contentScrolled) {
+      this.invalidateLayout();
+    }
+
+    // TODO CGU menubar bottom behandeln, tabbox behandeln, erst noch andere widgets anschauen, ob es noch mehr probleme gibt
+
+    if (contentScrolled && !this.menuBar.visible) {
+      if (this._statusPositionOrg === null) {
+        this._statusPositionOrg = this.statusPosition;
+      }
+      this.setStatusPosition(FormField.StatusPosition.TOP);
+    } else if (this._statusPositionOrg) {
+      this.setStatusPosition(this._statusPositionOrg);
+      this._statusPositionOrg = null;
+    }
+
+    // Prevent flickering of status icon
+    this.validateLayout();
   }
 
   setMainBox(mainBox) {
@@ -597,6 +634,12 @@ export default class GroupBox extends CompositeField {
     if (this.rendered) {
       this.menuBar.remove();
       this._renderMenuBarVisible();
+    }
+  }
+
+  _updateMenuBarVisible() {
+    if (this.rendered || this.rendering) {
+      this.$container.toggleClass('menubar-visible', this.menuBar.visible);
     }
   }
 

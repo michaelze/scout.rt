@@ -39,6 +39,19 @@
   &.collapsed > .menubar {
     display: none;
   }
+
+  &.content-scrolled-y {
+    &:not(.menubar-visible) > .group-box-header {
+      width: 100%;
+      margin-left: 0;
+      padding-left: @mandatory-indicator-width;
+    }
+
+    & > .menubar {
+      margin-left: 0;
+      padding-left: @mandatory-indicator-width;
+    }
+  }
 }
 
 .root-group-box,

@@ -143,7 +143,9 @@
     }
 
     & + .scroll-shadow {
-      #scout.scroll-shadow(@scroll-shadow-size-large);
+      --scroll-shadow-size: @scroll-shadow-size-large;
+      --scroll-shadow-blur: @scroll-shadow-size-large;
+      --scroll-shadow-spread: @scroll-shadow-size-large;
     }
 
     & > .table-row,

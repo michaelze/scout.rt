@@ -10,8 +10,10 @@
  */
 @scrollbar-size-transition-speed: 125ms;
 @scroll-shadow-size-large: 10px;
-@scroll-shadow-size: 10px;
-@scroll-shadow-alpha: 100%;
+@scroll-shadow-size: 5px;
+@scroll-shadow-alpha: 20%;
+@scroll-shadow-color: rgba(0, 0, 0, @scroll-shadow-alpha);
+@scroll-shadow-light-color: white;
 
 .scrollbar {
   position: absolute;
@@ -137,7 +139,14 @@
   position: absolute;
   pointer-events: none;
 
-  #scout.scroll-shadow(@scroll-shadow-size);
+  #scout.scroll-shadow();
+
+  &.light {
+    --scroll-shadow-color: @scroll-shadow-light-color;
+    --scroll-shadow-size: 20px;
+    --scroll-shadow-blur: 15px;
+    --scroll-shadow-spread: 15px;
+  }
 
   &.large {
     #scout.scroll-shadow(@scroll-shadow-size-large);
@@ -145,71 +154,75 @@
 }
 
 #scout {
-  .scroll-shadow(@scroll-shadow-size) {
-    @scroll-shadow-blur-spread-color: @scroll-shadow-size -@scroll-shadow-size rgba(0, 0, 0, @scroll-shadow-alpha);
-    @scroll-shadow-top: inset 0 @scroll-shadow-size @scroll-shadow-blur-spread-color;
-    @scroll-shadow-bottom: inset 0 -@scroll-shadow-size @scroll-shadow-blur-spread-color;
-    @scroll-shadow-left: inset @scroll-shadow-size 0 @scroll-shadow-blur-spread-color;
-    @scroll-shadow-right: inset -@scroll-shadow-size 0 @scroll-shadow-blur-spread-color;
+  .scroll-shadow(@scroll-shadow-size: @scroll-shadow-size, @scroll-shadow-blur: @scroll-shadow-size, @scroll-shadow-spread: @scroll-shadow-size, @scroll-shadow-color: @scroll-shadow-color) {
+    --scroll-shadow-color: @scroll-shadow-color;
+    --scroll-shadow-size: @scroll-shadow-size;
+    --scroll-shadow-blur: @scroll-shadow-blur;
+    --scroll-shadow-spread: @scroll-shadow-spread;
+    @scroll-shadow-blur-spread-color: var(--scroll-shadow-blur) calc(-1 * var(--scroll-shadow-spread)) var(--scroll-shadow-color);
+    @scroll-shadow-top: inset 0 var(--scroll-shadow-size) @scroll-shadow-blur-spread-color;
+    @scroll-shadow-bottom: inset 0 calc(-1 * var(--scroll-shadow-size)) @scroll-shadow-blur-spread-color;
+    @scroll-shadow-left: inset var(--scroll-shadow-size) 0 @scroll-shadow-blur-spread-color;
+    @scroll-shadow-right: inset calc(-1 * var(--scroll-shadow-size)) 0 @scroll-shadow-blur-spread-color;
     @scroll-shadow-none: inset 0 0 0 0 transparent;
 
-    &.scroll-shadow-top {
+    &.top {
       box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-none;
 
-      &.scroll-shadow-bottom {
+      &.bottom {
         box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-none;
 
-        &.scroll-shadow-left {
+        &.left {
           box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-left;
         }
 
-        &.scroll-shadow-right {
+        &.right {
           box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-none;
 
-          &.scroll-shadow-left {
+          &.left {
             box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-left;
           }
         }
       }
 
-      &.scroll-shadow-left {
+      &.left {
         box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-left;
 
-        &.scroll-shadow-right {
+        &.right {
           box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-left;
         }
       }
 
-      &.scroll-shadow-right {
+      &.right {
         box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-none;
       }
     }
 
-    &.scroll-shadow-bottom {
+    &.bottom {
       box-shadow: @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-none;
 
-      &.scroll-shadow-right {
+      &.right {
         box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-none;
       }
     }
 
-    &.scroll-shadow-left {
+    &.left {
       box-shadow: @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-left;
 
-      &.scroll-shadow-right {
+      &.right {
         box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-left;
       }
 
-      &.scroll-shadow-bottom {
+      &.bottom {
         box-shadow: @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-left;
 
-        &.scroll-shadow-right {
+        &.right {
           box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-left;
         }
       }
     }
 
-    &.scroll-shadow-right {
+    &.right {
       box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-none;
     }
   }
